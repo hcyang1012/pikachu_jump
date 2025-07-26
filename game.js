@@ -9,21 +9,39 @@ const characters = {
         name: '리자몽',
         color: '#FF8C00',
         effectColor: '#FF4500',
-        description: '강력한 불꽃 포켓몬'
+        description: '강력한 불꽃 포켓몬',
+        // 불꽃 타입 특성: 높은 점프력, 빠른 속도, 강한 공격력
+        jumpPower: -18,
+        gravity: 0.6,
+        maxJumps: 4,
+        specialAttackDamage: 150,
+        speedMultiplier: 1.2
     },
     pikachu: {
         id: 25,
         name: '피카츄',
         color: '#FFD700',
         effectColor: '#FFD700',
-        description: '귀여운 전기 포켓몬'
+        description: '귀여운 전기 포켓몬',
+        // 전기 타입 특성: 빠른 점프, 낮은 중력, 많은 점프 횟수
+        jumpPower: -14,
+        gravity: 0.4,
+        maxJumps: 8,
+        specialAttackDamage: 100,
+        speedMultiplier: 1.5
     },
     squirtle: {
         id: 7,
         name: '꼬부기',
         color: '#4682B4',
         effectColor: '#00CED1',
-        description: '튼튼한 물 포켓몬'
+        description: '튼튼한 물 포켓몬',
+        // 물 타입 특성: 안정적인 점프, 높은 체력, 방어력
+        jumpPower: -12,
+        gravity: 0.8,
+        maxJumps: 3,
+        specialAttackDamage: 80,
+        speedMultiplier: 0.8
     }
 };
 
@@ -113,7 +131,7 @@ let gameState = {
     lastObstacleTime: 0,
     obstacleInterval: 2000, // 2초마다 장애물 생성
     jumpCount: 0, // 점프 횟수
-    maxJumps: 6, // 최대 점프 횟수 (6단 점프 지원)
+    maxJumps: currentCharacter.maxJumps, // 캐릭터별 최대 점프 횟수
     lastJumpTime: 0, // 마지막 점프 시간
     jumpCooldown: detectMobile() ? 100 : 600, // 모바일: 100ms (더블/트리플 점프용), PC: 600ms
     specialAttackCount: 2, // 필살기 횟수
@@ -128,8 +146,8 @@ const player = {
     height: detectMobile() ? 35 : 40,
     velocityY: 0,
     isJumping: false,
-    jumpPower: -16,
-    gravity: 0.7,
+    jumpPower: currentCharacter.jumpPower,
+    gravity: currentCharacter.gravity,
     groundY: canvas.height - (detectMobile() ? 120 : 140)
 };
 
@@ -349,6 +367,36 @@ function jump() {
             keys.Space = false;
         }, resetTime);
     }
+    // 일곱 번째 점프 (공중에서, 쿨다운 확인)
+    else if (gameState.jumpCount === 6 && 
+             currentTime - gameState.lastJumpTime >= gameState.jumpCooldown) {
+        player.velocityY = player.jumpPower;
+        gameState.jumpCount++;
+        gameState.lastJumpTime = currentTime;
+        playSound('jumpSound');
+        
+        // 터치 후 키 상태 초기화 (모바일용)
+        const resetTime = detectMobile() ? 300 : 80; // 모바일에서 더 긴 초기화 시간
+        setTimeout(() => {
+            keys.ArrowUp = false;
+            keys.Space = false;
+        }, resetTime);
+    }
+    // 여덟 번째 점프 (공중에서, 쿨다운 확인)
+    else if (gameState.jumpCount === 7 && 
+             currentTime - gameState.lastJumpTime >= gameState.jumpCooldown) {
+        player.velocityY = player.jumpPower;
+        gameState.jumpCount++;
+        gameState.lastJumpTime = currentTime;
+        playSound('jumpSound');
+        
+        // 터치 후 키 상태 초기화 (모바일용)
+        const resetTime = detectMobile() ? 300 : 80; // 모바일에서 더 긴 초기화 시간
+        setTimeout(() => {
+            keys.ArrowUp = false;
+            keys.Space = false;
+        }, resetTime);
+    }
 }
 
 // 플레이어 업데이트
@@ -434,8 +482,11 @@ class Villain {
     
     draw() {
         if (this.imageLoaded && this.image) {
-            // 실제 악당 이미지 그리기
-            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            // 실제 악당 이미지 그리기 (좌우 반전)
+            ctx.save();
+            ctx.scale(-1, 1); // 좌우 반전
+            ctx.drawImage(this.image, -this.x - this.width, this.y, this.width, this.height); // x 좌표 조정
+            ctx.restore();
         } else {
             // 기본 악당 그리기 (로딩 중이거나 실패한 경우)
             ctx.fillStyle = '#8B0000'; // 어두운 빨간색
@@ -665,10 +716,11 @@ function spawnPowerUp() {
 // 선택된 캐릭터 그리기 함수
 function drawCharacter(x, y, width, height) {
     if (imageLoaded) {
-        // 실제 캐릭터 이미지 그리기 (투명 배경)
+        // 실제 캐릭터 이미지 그리기 (좌우 반전)
         ctx.save();
         ctx.globalCompositeOperation = 'source-over';
-        ctx.drawImage(characterImage, x, y, width, height);
+        ctx.scale(-1, 1); // 좌우 반전
+        ctx.drawImage(characterImage, -x - width, y, width, height); // x 좌표 조정
         ctx.restore();
         
         // 캐릭터 효과 (점프할 때)
@@ -766,7 +818,7 @@ function specialAttack() {
                 gameState.particles.push(new Particle(
                     obstacle.x + obstacle.width/2,
                     obstacle.y + obstacle.height/2,
-                    '#FF4500'
+                    currentCharacter.effectColor
                 ));
             }
         });
@@ -777,8 +829,8 @@ function specialAttack() {
         // 필살기 효과음 재생
         playSound('powerUpSound');
         
-        // 점수 추가
-        gameState.score += 100;
+        // 캐릭터별 점수 추가
+        gameState.score += currentCharacter.specialAttackDamage;
         
         // 화면 깜빡임 효과
         createScreenFlash();
@@ -993,20 +1045,20 @@ function restartGame() {
         lastObstacleTime: 0,
         obstacleInterval: 2000,
         jumpCount: 0,
-        maxJumps: 6, // 6단 점프 지원
+        maxJumps: currentCharacter.maxJumps, // 캐릭터별 최대 점프 횟수
         lastJumpTime: 0,
         jumpCooldown: detectMobile() ? 100 : 600,
         specialAttackCount: 2, // 필살기 횟수
         maxSpecialAttacks: 4 // 최대 필살기 횟수
     };
     
-    // 모바일에서 플레이어 물리 조정
+    // 캐릭터별 물리 조정
     if (detectMobile()) {
-        player.gravity = 0.3; // 더 천천히 떨어짐
-        player.jumpPower = -8; // 더 낮은 점프
+        player.gravity = currentCharacter.gravity * 0.5; // 모바일에서는 더 천천히 떨어짐
+        player.jumpPower = currentCharacter.jumpPower * 0.6; // 모바일에서는 더 낮은 점프
     } else {
-        player.gravity = 0.8;
-        player.jumpPower = -15;
+        player.gravity = currentCharacter.gravity;
+        player.jumpPower = currentCharacter.jumpPower;
     }
     
     // 모바일에서 플레이어 위치 조정
@@ -1075,8 +1127,8 @@ if (detectMobile()) {
     
     // 모바일에서 게임 속도 조정
     gameState.gameSpeed = 1.5; // PC: 2.5 → 모바일: 1.5 (더 천천히)
-    player.gravity = 0.3; // PC: 0.8 → 모바일: 0.3 (더 천천히 떨어짐)
-    player.jumpPower = -8; // PC: -15 → 모바일: -8 (더 낮은 점프)
+    player.gravity = currentCharacter.gravity * 0.5; // 모바일에서는 더 천천히 떨어짐
+    player.jumpPower = currentCharacter.jumpPower * 0.6; // 모바일에서는 더 낮은 점프
 }
 
 // 게임 시작
