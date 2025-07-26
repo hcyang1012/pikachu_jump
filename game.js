@@ -144,8 +144,8 @@ function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
     
-    // 터치 쿨다운 체크 (모바일에서는 더 짧게)
-    const cooldown = detectMobile() ? 100 : 150; // 모바일 쿨다운 더 짧게
+    // 터치 쿨다운 체크 (모바일에서는 조금 더 길게)
+    const cooldown = detectMobile() ? 150 : 150; // 모바일 쿨다운 조정
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
@@ -247,7 +247,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 100 : 80; // 모바일에서 더 짧은 초기화 시간
+        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 조금 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -262,7 +262,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 100 : 80; // 모바일에서 더 짧은 초기화 시간
+        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 조금 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -277,7 +277,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 100 : 80; // 모바일에서 더 짧은 초기화 시간
+        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 조금 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
