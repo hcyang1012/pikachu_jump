@@ -94,22 +94,22 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 2, // 최대 점프 횟수
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: detectMobile() ? 400 : 600, // 모바일: 400ms, PC: 600ms
+    jumpCooldown: detectMobile() ? 200 : 600, // 모바일: 200ms (더 빠른 이단 점프), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
 
 // 플레이어 설정
 const player = {
-    x: 150,
-    y: canvas.height - 80,
-    width: 40,
-    height: 40,
+    x: detectMobile() ? 80 : 150, // 모바일에서는 더 왼쪽에 위치
+    y: canvas.height - (detectMobile() ? 60 : 80),
+    width: detectMobile() ? 35 : 40, // 모바일에서는 조금 작게
+    height: detectMobile() ? 35 : 40,
     velocityY: 0,
     isJumping: false,
     jumpPower: -16,
     gravity: 0.7,
-    groundY: canvas.height - 80
+    groundY: canvas.height - (detectMobile() ? 60 : 80)
 };
 
 // 키보드 입력 상태
@@ -147,8 +147,9 @@ function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
     
-    // 더블 탭 감지
-    if (currentTime - lastTapTime < 300) { // 300ms 내에 두 번째 탭
+    // 더블 탭 감지 (모바일에서는 더 긴 시간 허용)
+    const doubleTapTime = detectMobile() ? 500 : 300;
+    if (currentTime - lastTapTime < doubleTapTime) { // 모바일: 500ms, PC: 300ms
         tapCount++;
         if (tapCount === 2) {
             // 더블 탭으로 필살기 실행
@@ -162,8 +163,9 @@ function handleTouchStart(e) {
     }
     lastTapTime = currentTime;
     
-    // 터치 쿨다운 체크 (150ms로 단축)
-    if (currentTime - touchCooldown < 150) {
+    // 터치 쿨다운 체크 (모바일에서는 더 짧게)
+    const cooldown = detectMobile() ? 100 : 150;
+    if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
     
@@ -198,13 +200,14 @@ function handleTouchEnd(e) {
     // 필살기는 즉시 비활성화
     keys.Enter = false;
     
-    // 더블 탭 타이머 (500ms 후 리셋)
+    // 더블 탭 타이머 (모바일에서는 더 긴 시간)
+    const resetTime = detectMobile() ? 800 : 500;
     setTimeout(() => {
         if (tapCount === 1) {
             tapCount = 0;
             lastTapTime = 0;
         }
-    }, 500);
+    }, resetTime);
 }
 
 function handleTouchMove(e) {
@@ -247,10 +250,11 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
+        const resetTime = detectMobile() ? 50 : 80;
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
-        }, 80); // 100ms → 80ms로 조정
+        }, resetTime);
     }
     // 두 번째 점프 (공중에서, 쿨다운 확인)
     else if (gameState.jumpCount === 1 && 
@@ -261,10 +265,11 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
+        const resetTime = detectMobile() ? 50 : 80;
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
-        }, 80); // 100ms → 80ms로 조정
+        }, resetTime);
     }
 }
 
@@ -845,7 +850,7 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 2,
         lastJumpTime: 0,
-        jumpCooldown: detectMobile() ? 400 : 600,
+        jumpCooldown: detectMobile() ? 200 : 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
@@ -859,7 +864,20 @@ function restartGame() {
         player.jumpPower = -15;
     }
     
-    player.y = player.groundY;
+    // 모바일에서 플레이어 위치 조정
+    if (detectMobile()) {
+        player.x = 80;
+        player.y = canvas.height - 60;
+        player.width = 35;
+        player.height = 35;
+        player.groundY = canvas.height - 60;
+    } else {
+        player.x = 150;
+        player.y = canvas.height - 80;
+        player.width = 40;
+        player.height = 40;
+        player.groundY = canvas.height - 80;
+    }
     player.velocityY = 0;
     player.isJumping = false;
     

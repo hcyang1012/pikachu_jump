@@ -23,12 +23,16 @@
             border: 3px solid #333;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            max-width: 100vw;
+            max-height: 100vh;
         }
         
         #gameCanvas {
             display: block;
             background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);
             touch-action: none; /* 캔버스에서 기본 터치 동작 비활성화 */
+            max-width: 100%;
+            max-height: 100%;
         }
         
         .ui {
@@ -69,13 +73,13 @@
         /* 세로모드 최적화 */
         @media (max-width: 768px) and (orientation: portrait) {
             .ui {
-                font-size: 18px;
-                top: 10px;
-                left: 10px;
+                font-size: 20px;
+                top: 15px;
+                left: 15px;
             }
             
             .ui div {
-                margin-bottom: 5px;
+                margin-bottom: 8px;
             }
         }
         
@@ -171,12 +175,37 @@
             }
             
             .game-container {
-                padding: 10px;
+                padding: 5px;
+                width: 95vw;
+                height: 95vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
             
             #gameCanvas {
-                max-width: 100%;
-                height: auto;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+        
+        /* 세로모드 최적화 */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .game-container {
+                width: 98vw;
+                height: 98vh;
+                padding: 2px;
+            }
+            
+            #gameCanvas {
+                width: 100%;
+                height: 100%;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
             }
         }
         
@@ -286,26 +315,26 @@
         /* 세로모드 버튼 크기 최적화 */
         @media (max-width: 768px) and (orientation: portrait) {
             .character-change-btn {
-                width: 55px;
-                height: 55px;
-                font-size: 22px;
-                top: 8px;
-                right: 8px;
+                width: 65px;
+                height: 65px;
+                font-size: 26px;
+                top: 12px;
+                right: 12px;
             }
             
             .special-attack-btn {
-                width: 55px;
-                height: 55px;
-                font-size: 22px;
-                top: 8px;
-                right: 68px;
+                width: 65px;
+                height: 65px;
+                font-size: 26px;
+                top: 12px;
+                right: 82px;
             }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <canvas id="gameCanvas" width="400" height="700"></canvas>
         <div class="ui">
             <div>점수: <span id="score">0</span></div>
             <div>생명: <span id="lives">3</span></div>
