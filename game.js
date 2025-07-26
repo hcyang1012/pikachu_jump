@@ -268,7 +268,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 조금 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 200 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -283,7 +283,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 조금 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 200 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -298,7 +298,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 조금 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 200 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
