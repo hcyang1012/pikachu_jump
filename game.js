@@ -94,7 +94,7 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 2, // 최대 점프 횟수
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: detectMobile() ? 200 : 600, // 모바일: 200ms (더 빠른 이단 점프), PC: 600ms
+    jumpCooldown: detectMobile() ? 50 : 600, // 모바일: 200ms (더 빠른 이단 점프), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
