@@ -94,7 +94,7 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 3, // 최대 점프 횟수 (3단 점프 지원)
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: detectMobile() ? 150 : 600, // 모바일: 150ms (적당한 쿨다운), PC: 600ms
+    jumpCooldown: detectMobile() ? 50 : 600, // 모바일: 50ms (매우 짧은 쿨다운), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
@@ -144,8 +144,8 @@ function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
     
-    // 터치 쿨다운 체크 (모바일에서는 적당히)
-    const cooldown = detectMobile() ? 200 : 150; // 모바일 쿨다운 조정
+    // 터치 쿨다운 체크 (모바일에서는 더 짧게)
+    const cooldown = detectMobile() ? 100 : 150; // 모바일 쿨다운 더 짧게
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
@@ -153,13 +153,9 @@ function handleTouchStart(e) {
     lastTouchTime = currentTime;
     touchStartTime = currentTime;
     
-    // 점프 활성화 (이전 상태 초기화 후)
-    keys.ArrowUp = false;
-    keys.Space = false;
-    setTimeout(() => {
-        keys.ArrowUp = true;
-        keys.Space = true;
-    }, 10);
+    // 점프 활성화 (즉시)
+    keys.ArrowUp = true;
+    keys.Space = true;
     
     // 터치 쿨다운 설정
     touchCooldown = currentTime;
@@ -251,7 +247,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 200 : 80; // 모바일에서 적당한 초기화 시간
+        const resetTime = detectMobile() ? 100 : 80; // 모바일에서 더 짧은 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -266,7 +262,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 200 : 80; // 모바일에서 적당한 초기화 시간
+        const resetTime = detectMobile() ? 100 : 80; // 모바일에서 더 짧은 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -281,7 +277,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 200 : 80; // 모바일에서 적당한 초기화 시간
+        const resetTime = detectMobile() ? 100 : 80; // 모바일에서 더 짧은 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -880,7 +876,7 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 3, // 3단 점프 지원
         lastJumpTime: 0,
-        jumpCooldown: detectMobile() ? 150 : 600,
+        jumpCooldown: detectMobile() ? 50 : 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
