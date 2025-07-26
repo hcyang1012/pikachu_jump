@@ -78,6 +78,109 @@ class SoundManager {
         oscillator.start(this.audioContext.currentTime);
         oscillator.stop(this.audioContext.currentTime + 0.15);
     }
+    
+    // 불꽃 방사 사운드 생성
+    createFireBlastSound() {
+        if (!this.audioContext) return;
+        
+        // 여러 개의 오실레이터로 불꽃 효과
+        for (let i = 0; i < 3; i++) {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(200 + i * 100, this.audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(400 + i * 100, this.audioContext.currentTime + 0.3);
+            
+            gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+            
+            oscillator.start(this.audioContext.currentTime + i * 0.1);
+            oscillator.stop(this.audioContext.currentTime + 0.3 + i * 0.1);
+        }
+    }
+    
+    // 번개 사운드 생성
+    createThunderSound() {
+        if (!this.audioContext) return;
+        
+        // 높은 주파수의 번개 효과
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.2);
+        
+        gainNode.gain.setValueAtTime(0.4, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.2);
+        
+        // 추가 번개 효과
+        setTimeout(() => {
+            const oscillator2 = this.audioContext.createOscillator();
+            const gainNode2 = this.audioContext.createGain();
+            
+            oscillator2.connect(gainNode2);
+            gainNode2.connect(this.audioContext.destination);
+            
+            oscillator2.frequency.setValueAtTime(600, this.audioContext.currentTime);
+            oscillator2.frequency.exponentialRampToValueAtTime(150, this.audioContext.currentTime + 0.15);
+            
+            gainNode2.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+            gainNode2.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+            
+            oscillator2.start(this.audioContext.currentTime);
+            oscillator2.stop(this.audioContext.currentTime + 0.15);
+        }, 100);
+    }
+    
+    // 물대포 사운드 생성
+    createHydroPumpSound() {
+        if (!this.audioContext) return;
+        
+        // 물이 퍼지는 효과
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(600, this.audioContext.currentTime + 0.4);
+        
+        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.4);
+        
+        // 물 방울 효과
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                const oscillator2 = this.audioContext.createOscillator();
+                const gainNode2 = this.audioContext.createGain();
+                
+                oscillator2.connect(gainNode2);
+                gainNode2.connect(this.audioContext.destination);
+                
+                oscillator2.frequency.setValueAtTime(400 + i * 50, this.audioContext.currentTime);
+                oscillator2.frequency.exponentialRampToValueAtTime(200 + i * 50, this.audioContext.currentTime + 0.2);
+                
+                gainNode2.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                gainNode2.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+                
+                oscillator2.start(this.audioContext.currentTime);
+                oscillator2.stop(this.audioContext.currentTime + 0.2);
+            }, i * 50);
+        }
+    }
 
     // 게임오버 사운드 생성
     createGameOverSound() {
@@ -173,6 +276,19 @@ class SoundManager {
     playGameOver() {
         this.createGameOverSound();
     }
+    
+    // 캐릭터별 필살기 사운드
+    playFireBlast() {
+        this.createFireBlastSound();
+    }
+    
+    playThunder() {
+        this.createThunderSound();
+    }
+    
+    playHydroPump() {
+        this.createHydroPumpSound();
+    }
 
     startBgMusic() {
         // 배경음악 비활성화
@@ -185,4 +301,33 @@ class SoundManager {
 }
 
 // 전역 사운드 매니저 인스턴스 생성
-window.soundManager = new SoundManager(); 
+window.soundManager = new SoundManager();
+
+// 전역 사운드 재생 함수
+function playSound(soundName) {
+    if (window.soundManager) {
+        switch (soundName) {
+            case 'jumpSound':
+                window.soundManager.playJump();
+                break;
+            case 'collisionSound':
+                window.soundManager.playCollision();
+                break;
+            case 'powerUpSound':
+                window.soundManager.playPowerUp();
+                break;
+            case 'gameOverSound':
+                window.soundManager.playGameOver();
+                break;
+            case 'fireBlast':
+                window.soundManager.playFireBlast();
+                break;
+            case 'thunder':
+                window.soundManager.playThunder();
+                break;
+            case 'hydroPump':
+                window.soundManager.playHydroPump();
+                break;
+        }
+    }
+} 

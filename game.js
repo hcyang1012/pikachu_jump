@@ -16,7 +16,12 @@ const characters = {
         maxJumps: 4,
         specialAttackDamage: 150,
         speedMultiplier: 1.2,
-        maxLives: 3 // 보통 체력
+        maxLives: 3, // 보통 체력
+        // 불꽃 타입 필살기: 화염 방사
+        specialAttackEffect: 'fire',
+        specialAttackSound: 'fireBlast',
+        specialAttackParticles: 80,
+        specialAttackColor: '#FF4500'
     },
     pikachu: {
         id: 25,
@@ -30,7 +35,12 @@ const characters = {
         maxJumps: 8,
         specialAttackDamage: 100,
         speedMultiplier: 1.5,
-        maxLives: 2 // 낮은 체력 (빠르지만 약함)
+        maxLives: 2, // 낮은 체력 (빠르지만 약함)
+        // 전기 타입 필살기: 번개 공격
+        specialAttackEffect: 'lightning',
+        specialAttackSound: 'thunder',
+        specialAttackParticles: 120,
+        specialAttackColor: '#FFD700'
     },
     squirtle: {
         id: 7,
@@ -44,7 +54,12 @@ const characters = {
         maxJumps: 3,
         specialAttackDamage: 80,
         speedMultiplier: 0.8,
-        maxLives: 5 // 높은 체력 (튼튼함)
+        maxLives: 5, // 높은 체력 (튼튼함)
+        // 물 타입 필살기: 물대포
+        specialAttackEffect: 'water',
+        specialAttackSound: 'hydroPump',
+        specialAttackParticles: 60,
+        specialAttackColor: '#00CED1'
     }
 };
 
@@ -88,6 +103,15 @@ function playSound(soundName) {
                 break;
             case 'gameOverSound':
                 window.soundManager.playGameOver();
+                break;
+            case 'fireBlast':
+                window.soundManager.playFireBlast();
+                break;
+            case 'thunder':
+                window.soundManager.playThunder();
+                break;
+            case 'hydroPump':
+                window.soundManager.playHydroPump();
                 break;
         }
     }
@@ -811,13 +835,8 @@ function specialAttack() {
     if (gameState.specialAttackCount > 0) {
         gameState.specialAttackCount--;
         
-        // 화면 전체에 필살기 효과 파티클 생성
-        for (let i = 0; i < 50; i++) {
-            gameState.specialEffectParticles.push(new SpecialEffectParticle(
-                Math.random() * canvas.width,
-                Math.random() * canvas.height
-            ));
-        }
+        // 캐릭터별 필살기 효과 적용
+        createCharacterSpecialEffect();
         
         // 화면의 모든 악당 파괴
         gameState.obstacles.forEach((obstacle, index) => {
@@ -826,7 +845,7 @@ function specialAttack() {
                 gameState.particles.push(new Particle(
                     obstacle.x + obstacle.width/2,
                     obstacle.y + obstacle.height/2,
-                    currentCharacter.effectColor
+                    currentCharacter.specialAttackColor
                 ));
             }
         });
@@ -835,13 +854,108 @@ function specialAttack() {
         gameState.obstacles = [];
         
         // 필살기 효과음 재생
-        playSound('powerUpSound');
+        playSound(currentCharacter.specialAttackSound);
         
         // 캐릭터별 점수 추가
         gameState.score += currentCharacter.specialAttackDamage;
         
         // 화면 깜빡임 효과
         createScreenFlash();
+    }
+}
+
+// 캐릭터별 필살기 효과 생성
+function createCharacterSpecialEffect() {
+    const effect = currentCharacter.specialAttackEffect;
+    const particleCount = currentCharacter.specialAttackParticles;
+    const color = currentCharacter.specialAttackColor;
+    
+    switch (effect) {
+        case 'fire':
+            // 불꽃 효과: 화면 전체에 불꽃 파티클
+            for (let i = 0; i < particleCount; i++) {
+                gameState.specialEffectParticles.push(new SpecialEffectParticle(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height
+                ));
+            }
+            // 추가 불꽃 효과
+            createFireEffect();
+            break;
+            
+        case 'lightning':
+            // 번개 효과: 화면 전체에 전기 파티클
+            for (let i = 0; i < particleCount; i++) {
+                gameState.specialEffectParticles.push(new SpecialEffectParticle(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height
+                ));
+            }
+            // 추가 번개 효과
+            createLightningEffect();
+            break;
+            
+        case 'water':
+            // 물 효과: 화면 전체에 물 파티클
+            for (let i = 0; i < particleCount; i++) {
+                gameState.specialEffectParticles.push(new SpecialEffectParticle(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height
+                ));
+            }
+            // 추가 물 효과
+            createWaterEffect();
+            break;
+    }
+}
+
+// 불꽃 효과
+function createFireEffect() {
+    // 화면 중앙에서 불꽃이 퍼지는 효과
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    for (let i = 0; i < 30; i++) {
+        const angle = (Math.PI * 2 * i) / 30;
+        const distance = 50 + Math.random() * 100;
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
+        
+        gameState.particles.push(new Particle(x, y, '#FF4500'));
+    }
+}
+
+// 번개 효과
+function createLightningEffect() {
+    // 화면 전체에 번개 효과
+    for (let i = 0; i < 5; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        
+        // 번개 모양 파티클
+        for (let j = 0; j < 10; j++) {
+            gameState.particles.push(new Particle(
+                x + (Math.random() - 0.5) * 50,
+                y + (Math.random() - 0.5) * 50,
+                '#FFD700'
+            ));
+        }
+    }
+}
+
+// 물 효과
+function createWaterEffect() {
+    // 화면 중앙에서 물이 퍼지는 효과
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    for (let i = 0; i < 20; i++) {
+        const angle = (Math.PI * 2 * i) / 20;
+        const distance = 30 + Math.random() * 80;
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
+        
+        gameState.particles.push(new Particle(x, y, '#00CED1'));
     }
 }
 
