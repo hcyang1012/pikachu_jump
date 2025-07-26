@@ -138,13 +138,32 @@ document.addEventListener('keyup', (e) => {
 let touchStartTime = 0;
 let lastTouchTime = 0;
 let touchCooldown = 0;
+let doubleTapTime = 0;
+let lastTapTime = 0;
+let tapCount = 0;
 
-canvas.addEventListener('touchstart', (e) => {
+// 터치 이벤트 함수 (캔버스와 배경 모두에서 사용)
+function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
     
-    // 터치 쿨다운 체크 (200ms)
-    if (currentTime - touchCooldown < 200) {
+    // 더블 탭 감지
+    if (currentTime - lastTapTime < 300) { // 300ms 내에 두 번째 탭
+        tapCount++;
+        if (tapCount === 2) {
+            // 더블 탭으로 필살기 실행
+            triggerSpecialAttack();
+            tapCount = 0;
+            lastTapTime = 0;
+            return;
+        }
+    } else {
+        tapCount = 1;
+    }
+    lastTapTime = currentTime;
+    
+    // 터치 쿨다운 체크 (150ms로 단축)
+    if (currentTime - touchCooldown < 150) {
         return; // 쿨다운 중이면 무시
     }
     
@@ -161,9 +180,9 @@ canvas.addEventListener('touchstart', (e) => {
     
     // 터치 쿨다운 설정
     touchCooldown = currentTime;
-});
+}
 
-canvas.addEventListener('touchend', (e) => {
+function handleTouchEnd(e) {
     e.preventDefault();
     const currentTime = Date.now();
     
@@ -178,21 +197,38 @@ canvas.addEventListener('touchend', (e) => {
     
     // 필살기는 즉시 비활성화
     keys.Enter = false;
-});
+    
+    // 더블 탭 타이머 (500ms 후 리셋)
+    setTimeout(() => {
+        if (tapCount === 1) {
+            tapCount = 0;
+            lastTapTime = 0;
+        }
+    }, 500);
+}
 
-// 터치 이벤트 중지 (스크롤 방지)
-canvas.addEventListener('touchmove', (e) => {
+function handleTouchMove(e) {
     e.preventDefault();
-});
+}
 
-// 모바일에서 더블 탭 줌 방지
-document.addEventListener('touchstart', (e) => {
+// 캔버스에 터치 이벤트 추가
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchend', handleTouchEnd);
+canvas.addEventListener('touchmove', handleTouchMove);
+
+// 배경(body)에도 터치 이벤트 추가
+document.body.addEventListener('touchstart', handleTouchStart);
+document.body.addEventListener('touchend', handleTouchEnd);
+document.body.addEventListener('touchmove', handleTouchMove);
+
+// 모바일에서 더블 탭 줌 방지 (body에도 적용)
+document.body.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) {
         e.preventDefault();
     }
 }, { passive: false });
 
-document.addEventListener('touchend', (e) => {
+document.body.addEventListener('touchend', (e) => {
     if (e.touches.length > 1) {
         e.preventDefault();
     }
@@ -799,7 +835,7 @@ function restartGame() {
         score: 0,
         lives: 2,
         gameOver: false,
-        gameSpeed: detectMobile() ? 1.8 : 2.5, // 모바일 감지
+        gameSpeed: detectMobile() ? 1.5 : 2.5, // 모바일 감지
         obstacles: [],
         powerUps: [],
         particles: [],
@@ -816,8 +852,8 @@ function restartGame() {
     
     // 모바일에서 플레이어 물리 조정
     if (detectMobile()) {
-        player.gravity = 0.4; // 더 천천히 떨어짐
-        player.jumpPower = -10; // 더 낮은 점프
+        player.gravity = 0.3; // 더 천천히 떨어짐
+        player.jumpPower = -8; // 더 낮은 점프
     } else {
         player.gravity = 0.8;
         player.jumpPower = -15;
@@ -867,9 +903,9 @@ if (detectMobile()) {
     }
     
     // 모바일에서 게임 속도 조정
-    gameState.gameSpeed = 1.8; // PC: 2.5 → 모바일: 1.8
-    player.gravity = 0.4; // PC: 0.8 → 모바일: 0.4 (더 천천히 떨어짐)
-    player.jumpPower = -10; // PC: -15 → 모바일: -10 (더 낮은 점프)
+    gameState.gameSpeed = 1.5; // PC: 2.5 → 모바일: 1.5 (더 천천히)
+    player.gravity = 0.3; // PC: 0.8 → 모바일: 0.3 (더 천천히 떨어짐)
+    player.jumpPower = -8; // PC: -15 → 모바일: -8 (더 낮은 점프)
 }
 
 // 게임 시작

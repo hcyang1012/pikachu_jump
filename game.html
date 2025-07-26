@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -44,25 +44,38 @@
         /* 모바일에서 UI 크기 조정 */
         @media (max-width: 768px) {
             .ui {
+                font-size: 16px;
+                top: 8px;
+                left: 8px;
+            }
+            
+            .ui div {
+                margin-bottom: 4px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .ui {
                 font-size: 14px;
                 top: 5px;
                 left: 5px;
             }
             
             .ui div {
-                margin-bottom: 2px;
+                margin-bottom: 3px;
             }
         }
         
-        @media (max-width: 480px) {
+        /* 세로모드 최적화 */
+        @media (max-width: 768px) and (orientation: portrait) {
             .ui {
-                font-size: 12px;
-                top: 3px;
-                left: 3px;
+                font-size: 18px;
+                top: 10px;
+                left: 10px;
             }
             
             .ui div {
-                margin-bottom: 1px;
+                margin-bottom: 5px;
             }
         }
         
@@ -269,11 +282,30 @@
                 right: 55px;
             }
         }
+        
+        /* 세로모드 버튼 크기 최적화 */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .character-change-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 22px;
+                top: 8px;
+                right: 8px;
+            }
+            
+            .special-attack-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 22px;
+                top: 8px;
+                right: 68px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <canvas id="gameCanvas" width="1000" height="500"></canvas>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
         <div class="ui">
             <div>점수: <span id="score">0</span></div>
             <div>생명: <span id="lives">3</span></div>
@@ -301,7 +333,7 @@
             </div>
         </div>
         <div class="mobile-guide" id="mobileGuide">
-            터치: 점프 | 더블터치: 필살기
+            화면 어디든 터치: 점프 | 더블터치: 필살기 | 버튼: 필살기
         </div>
     </div>
     
