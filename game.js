@@ -15,7 +15,8 @@ const characters = {
         gravity: 0.6,
         maxJumps: 4,
         specialAttackDamage: 150,
-        speedMultiplier: 1.2
+        speedMultiplier: 1.2,
+        maxLives: 3 // 보통 체력
     },
     pikachu: {
         id: 25,
@@ -28,7 +29,8 @@ const characters = {
         gravity: 0.4,
         maxJumps: 8,
         specialAttackDamage: 100,
-        speedMultiplier: 1.5
+        speedMultiplier: 1.5,
+        maxLives: 2 // 낮은 체력 (빠르지만 약함)
     },
     squirtle: {
         id: 7,
@@ -41,7 +43,8 @@ const characters = {
         gravity: 0.8,
         maxJumps: 3,
         specialAttackDamage: 80,
-        speedMultiplier: 0.8
+        speedMultiplier: 0.8,
+        maxLives: 5 // 높은 체력 (튼튼함)
     }
 };
 
@@ -121,7 +124,7 @@ function preloadVillainImages() {
 // 게임 상태
 let gameState = {
     score: 0,
-    lives: 2,
+    lives: currentCharacter.maxLives,
     gameOver: false,
     gameSpeed: 2.5,
     obstacles: [],
@@ -276,6 +279,11 @@ document.addEventListener('touchstart', (e) => {
 // 플레이어 점프 함수
 function jump() {
     const currentTime = Date.now();
+    
+    // 점프 횟수가 최대값을 초과하면 점프 불가
+    if (gameState.jumpCount >= gameState.maxJumps) {
+        return;
+    }
     
     // 첫 번째 점프 (바닥에서)
     if (gameState.jumpCount === 0) {
@@ -917,7 +925,7 @@ function updateGame() {
         // 플레이어와 파워업 충돌 체크
         if (checkCollision(player, powerUp)) {
             if (powerUp.type === 'life') {
-                gameState.lives = Math.min(gameState.lives + 1, 5);
+                gameState.lives = Math.min(gameState.lives + 1, currentCharacter.maxLives);
                 createParticles(player.x + player.width/2, player.y + player.height/2, '#2ed573');
             } else if (powerUp.type === 'special') {
                 // 특별 파워업 효과 (예: 필살기 쿨다운 감소)
@@ -962,7 +970,8 @@ function updateGame() {
     // UI 업데이트
     document.getElementById('score').textContent = gameState.score;
     document.getElementById('lives').textContent = gameState.lives;
-    document.getElementById('jumps').textContent = gameState.maxJumps - gameState.jumpCount;
+    document.getElementById('jumps').textContent = Math.max(0, gameState.maxJumps - gameState.jumpCount);
+    document.getElementById('maxJumps').textContent = gameState.maxJumps;
     document.getElementById('specialAttacks').textContent = gameState.specialAttackCount;
     
     // 필살기 버튼 상태 업데이트
@@ -1035,7 +1044,7 @@ function gameOver() {
 function restartGame() {
     gameState = {
         score: 0,
-        lives: 2,
+        lives: currentCharacter.maxLives,
         gameOver: false,
         gameSpeed: detectMobile() ? 1.5 : 2.5, // 모바일 감지
         obstacles: [],
@@ -1135,5 +1144,9 @@ if (detectMobile()) {
 setTimeout(() => {
     // 빌런 이미지 프리로딩 시작
     preloadVillainImages();
+    
+    // UI 초기화
+    document.getElementById('maxJumps').textContent = gameState.maxJumps;
+    
     gameLoop();
 }, 100); // 100ms 지연으로 사운드 시스템 완전 초기화 
