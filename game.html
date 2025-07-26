@@ -94,6 +94,8 @@
             border-radius: 10px;
             text-align: center;
             display: none;
+            z-index: 1000;
+            pointer-events: auto;
         }
         
         .game-over h2 {
@@ -128,6 +130,8 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 10px;
+            pointer-events: auto;
+            touch-action: manipulation;
         }
         
         .game-over button:hover {
@@ -193,9 +197,10 @@
         /* 세로모드 최적화 */
         @media (max-width: 768px) and (orientation: portrait) {
             .game-container {
-                width: 98vw;
-                height: 98vh;
-                padding: 2px;
+                width: 92vw;
+                height: 92vh;
+                padding: 4px;
+                margin: 4vh 4vw;
             }
             
             #gameCanvas {
@@ -328,6 +333,12 @@
                 font-size: 26px;
                 top: 12px;
                 right: 82px;
+            }
+            
+            .game-over button {
+                padding: 15px 25px;
+                font-size: 18px;
+                margin-top: 15px;
             }
         }
     </style>

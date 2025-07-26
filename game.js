@@ -177,9 +177,6 @@ function handleTouchEnd(e) {
     // 터치 종료 시 점프 키 비활성화
     keys.ArrowUp = false;
     keys.Space = false;
-    
-    // 필살기는 즉시 비활성화
-    keys.Enter = false;
 }
 
 function handleTouchMove(e) {
@@ -804,6 +801,14 @@ function gameOver() {
     document.getElementById('finalScore').textContent = gameState.score;
     document.getElementById('gameOver').style.display = 'block';
     playSound('gameOverSound');
+    
+    // 게임 오버 시 터치 이벤트 비활성화
+    canvas.removeEventListener('touchstart', handleTouchStart);
+    canvas.removeEventListener('touchend', handleTouchEnd);
+    canvas.removeEventListener('touchmove', handleTouchMove);
+    document.body.removeEventListener('touchstart', handleTouchStart);
+    document.body.removeEventListener('touchend', handleTouchEnd);
+    document.body.removeEventListener('touchmove', handleTouchMove);
 }
 
 // 게임 재시작 함수
@@ -854,6 +859,14 @@ function restartGame() {
     player.isJumping = false;
     
     document.getElementById('gameOver').style.display = 'none';
+    
+    // 게임 재시작 시 터치 이벤트 다시 활성화
+    canvas.addEventListener('touchstart', handleTouchStart);
+    canvas.addEventListener('touchend', handleTouchEnd);
+    canvas.addEventListener('touchmove', handleTouchMove);
+    document.body.addEventListener('touchstart', handleTouchStart);
+    document.body.addEventListener('touchend', handleTouchEnd);
+    document.body.addEventListener('touchmove', handleTouchMove);
 }
 
 // 필살기 버튼 클릭 함수
