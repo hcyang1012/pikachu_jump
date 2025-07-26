@@ -79,6 +79,27 @@ function startBgMusic() {
     }
 }
 
+// 빌런 이미지 프리로딩 시스템
+const villainImages = new Map();
+const villainIds = [52, 92, 109, 124, 143, 149, 150]; // 나옹, 고오스, 독침붕, 루주라, 잠만보, 망나뇽, 뮤츠
+
+// 빌런 이미지 프리로딩
+function preloadVillainImages() {
+    villainIds.forEach(id => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+        villainImages.set(id, { image: img, loaded: false });
+        
+        img.onload = () => {
+            villainImages.get(id).loaded = true;
+        };
+        
+        img.onerror = () => {
+            villainImages.get(id).loaded = false;
+        };
+    });
+}
+
 // 게임 상태
 let gameState = {
     score: 0,
@@ -144,8 +165,8 @@ function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
     
-    // 터치 쿨다운 체크 (모바일에서는 조금 더 길게)
-    const cooldown = detectMobile() ? 150 : 150; // 모바일 쿨다운 조정
+    // 터치 쿨다운 체크 (모바일에서는 더 길게)
+    const cooldown = detectMobile() ? 250 : 150; // 모바일 쿨다운 더 증가
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
@@ -342,16 +363,24 @@ class Villain {
     }
     
     loadImage() {
-        this.image = new Image();
-        this.image.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.villainType.id}.png`;
-        
-        this.image.onload = () => {
+        // 프리로딩된 이미지가 있는지 확인
+        const preloadedImage = villainImages.get(this.villainType.id);
+        if (preloadedImage && preloadedImage.loaded) {
+            this.image = preloadedImage.image;
             this.imageLoaded = true;
-        };
-        
-        this.image.onerror = () => {
-            this.imageLoaded = false;
-        };
+        } else {
+            // 프리로딩된 이미지가 없으면 새로 로드
+            this.image = new Image();
+            this.image.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.villainType.id}.png`;
+            
+            this.image.onload = () => {
+                this.imageLoaded = true;
+            };
+            
+            this.image.onerror = () => {
+                this.imageLoaded = false;
+            };
+        }
     }
     
     update() {
@@ -359,11 +388,11 @@ class Villain {
     }
     
     draw() {
-        if (this.imageLoaded) {
+        if (this.imageLoaded && this.image) {
             // 실제 악당 이미지 그리기
             ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
         } else {
-            // 기본 악당 그리기
+            // 기본 악당 그리기 (로딩 중이거나 실패한 경우)
             ctx.fillStyle = '#8B0000'; // 어두운 빨간색
             ctx.fillRect(this.x, this.y, this.width, this.height);
             
@@ -382,6 +411,14 @@ class Villain {
             // 악당 입 (검은색)
             ctx.fillStyle = '#000000';
             ctx.fillRect(this.x + this.width/2 - 3, this.y + this.height - 10, 6, 3);
+            
+            // 로딩 중 표시 (작은 점)
+            if (!this.imageLoaded) {
+                ctx.fillStyle = '#FFFF00';
+                ctx.beginPath();
+                ctx.arc(this.x + this.width/2, this.y + this.height/2, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
     }
 }
@@ -962,5 +999,7 @@ if (detectMobile()) {
 
 // 게임 시작
 setTimeout(() => {
+    // 빌런 이미지 프리로딩 시작
+    preloadVillainImages();
     gameLoop();
 }, 100); // 100ms 지연으로 사운드 시스템 완전 초기화 
