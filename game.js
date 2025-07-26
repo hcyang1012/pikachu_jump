@@ -115,7 +115,7 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 3, // 최대 점프 횟수 (3단 점프 지원)
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: detectMobile() ? 200 : 600, // 모바일: 200ms (더블/트리플 점프용), PC: 600ms
+    jumpCooldown: detectMobile() ? 100 : 600, // 모바일: 100ms (더블/트리플 점프용), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
@@ -165,8 +165,8 @@ function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
     
-    // 터치 쿨다운 체크 (모바일에서는 조금 줄임)
-    const cooldown = detectMobile() ? 300 : 150; // 모바일 쿨다운 300ms
+    // 터치 쿨다운 체크 (모바일에서는 더 줄임)
+    const cooldown = detectMobile() ? 200 : 150; // 모바일 쿨다운 200ms
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
@@ -913,7 +913,7 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 3, // 3단 점프 지원
         lastJumpTime: 0,
-        jumpCooldown: detectMobile() ? 200 : 600,
+        jumpCooldown: detectMobile() ? 100 : 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
