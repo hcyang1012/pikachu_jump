@@ -116,8 +116,8 @@ let gameState = {
     maxJumps: 6, // 최대 점프 횟수 (6단 점프 지원)
     lastJumpTime: 0, // 마지막 점프 시간
     jumpCooldown: detectMobile() ? 100 : 600, // 모바일: 100ms (더블/트리플 점프용), PC: 600ms
-    specialAttackCount: 3, // 필살기 횟수
-    maxSpecialAttacks: 3 // 최대 필살기 횟수
+    specialAttackCount: 2, // 필살기 횟수
+    maxSpecialAttacks: 4 // 최대 필살기 횟수
 };
 
 // 플레이어 설정
@@ -478,7 +478,15 @@ class PowerUp {
         const groundY = detectMobile() ? canvas.height - 120 : canvas.height - 140;
         this.y = groundY - 20 - Math.random() * 80; // 지면 위에서 랜덤 높이
         this.speed = gameState.gameSpeed;
-        this.type = Math.random() < 0.5 ? 'life' : 'score'; // 생명 아이템 비율 증가
+        // 'special' 타입 추가: 20% 확률로 등장, 나머지는 기존과 동일
+        const rand = Math.random();
+        if (rand < 0.2) {
+            this.type = 'special';
+        } else if (rand < 0.6) {
+            this.type = 'life';
+        } else {
+            this.type = 'score';
+        }
     }
     
     update() {
@@ -509,6 +517,27 @@ class PowerUp {
             ctx.lineWidth = 2;
             ctx.stroke();
             
+        } else if (this.type === 'special') {
+            // 파란색 별 모양 그리기
+            ctx.save();
+            ctx.fillStyle = '#3498db';
+            ctx.strokeStyle = '#2980b9';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const cx = this.x + this.width/2;
+            const cy = this.y + this.height/2;
+            const spikes = 5;
+            const outerRadius = this.width/2;
+            const innerRadius = this.width/4;
+            for (let i = 0; i < spikes * 2; i++) {
+                const angle = Math.PI / spikes * i;
+                const r = i % 2 === 0 ? outerRadius : innerRadius;
+                ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
         } else {
             // 점수 아이템 (기존 사각형)
             ctx.fillStyle = '#ffa502';
@@ -838,6 +867,10 @@ function updateGame() {
             if (powerUp.type === 'life') {
                 gameState.lives = Math.min(gameState.lives + 1, 5);
                 createParticles(player.x + player.width/2, player.y + player.height/2, '#2ed573');
+            } else if (powerUp.type === 'special') {
+                // 특별 파워업 효과 (예: 필살기 쿨다운 감소)
+                gameState.specialAttackCount = Math.min(gameState.specialAttackCount + 1, gameState.maxSpecialAttacks);
+                createParticles(player.x + player.width/2, player.y + player.height/2, '#54a0ff');
             } else {
                 gameState.score += 50;
                 createParticles(player.x + player.width/2, player.y + player.height/2, currentCharacter.effectColor); // 캐릭터별 색상
@@ -870,6 +903,8 @@ function updateGame() {
         } else {
             gameState.gameSpeed += 0.3; // PC: 기존 속도
         }
+        // 최대 속도 제한 추가
+        if (gameState.gameSpeed > 6) gameState.gameSpeed = 6;
     }
     
     // UI 업데이트
@@ -961,8 +996,8 @@ function restartGame() {
         maxJumps: 6, // 6단 점프 지원
         lastJumpTime: 0,
         jumpCooldown: detectMobile() ? 100 : 600,
-        specialAttackCount: 3,
-        maxSpecialAttacks: 3
+        specialAttackCount: 2, // 필살기 횟수
+        maxSpecialAttacks: 4 // 최대 필살기 횟수
     };
     
     // 모바일에서 플레이어 물리 조정
