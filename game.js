@@ -94,7 +94,7 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 3, // 최대 점프 횟수 (3단 점프 지원)
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: detectMobile() ? 50 : 600, // 모바일: 200ms (더 빠른 이단 점프), PC: 600ms
+    jumpCooldown: detectMobile() ? 300 : 600, // 모바일: 300ms (더 긴 쿨다운), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
@@ -138,20 +138,27 @@ document.addEventListener('keyup', (e) => {
 let touchStartTime = 0;
 let lastTouchTime = 0;
 let touchCooldown = 0;
+let isTouchActive = false; // 터치 활성화 상태 추적
 
 // 터치 이벤트 함수 (캔버스와 배경 모두에서 사용)
 function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
     
-    // 터치 쿨다운 체크 (모바일에서는 더 짧게)
-    const cooldown = detectMobile() ? 300 : 150; // 모바일 쿨다운 더 증가
+    // 이미 터치가 활성화되어 있으면 무시
+    if (isTouchActive) {
+        return;
+    }
+    
+    // 터치 쿨다운 체크 (모바일에서는 더 길게)
+    const cooldown = detectMobile() ? 500 : 200; // 모바일 쿨다운 더 증가
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
     
     lastTouchTime = currentTime;
     touchStartTime = currentTime;
+    isTouchActive = true; // 터치 활성화
     
     // 점프 활성화 (이전 상태 초기화 후)
     keys.ArrowUp = false;
@@ -168,6 +175,9 @@ function handleTouchStart(e) {
 function handleTouchEnd(e) {
     e.preventDefault();
     const currentTime = Date.now();
+    
+    // 터치 비활성화
+    isTouchActive = false;
     
     // 짧은 터치만 점프로 인식 (300ms 이하)
     if (currentTime - touchStartTime <= 300) {
@@ -213,15 +223,27 @@ if (characterChangeBtn) {
     });
 }
 
-// 모바일에서 더블 탭 줌 방지 (body에도 적용)
+// 모바일에서 더블 탭 줌 방지 및 터치 민감도 조절 (body에도 적용)
 document.body.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) {
         e.preventDefault();
     }
+    // 터치 이벤트 전파 방지
+    e.stopPropagation();
 }, { passive: false });
 
 document.body.addEventListener('touchend', (e) => {
     if (e.touches.length > 1) {
+        e.preventDefault();
+    }
+    // 터치 이벤트 전파 방지
+    e.stopPropagation();
+}, { passive: false });
+
+// 터치 이벤트 중복 방지를 위한 추가 설정
+document.addEventListener('touchstart', (e) => {
+    // 특정 요소가 아닌 경우 기본 동작 방지
+    if (!e.target.closest('.special-attack-btn') && !e.target.closest('.character-change-btn')) {
         e.preventDefault();
     }
 }, { passive: false });
@@ -239,7 +261,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 250 : 80; // 모바일에서 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 400 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -254,7 +276,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 250 : 80; // 모바일에서 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 400 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -269,7 +291,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 250 : 80; // 모바일에서 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 400 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -868,7 +890,7 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 3, // 3단 점프 지원
         lastJumpTime: 0,
-        jumpCooldown: detectMobile() ? 200 : 600,
+        jumpCooldown: detectMobile() ? 400 : 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
