@@ -722,9 +722,13 @@ function updateGame() {
         }
     });
     
-    // 게임 속도 증가 (더 점진적으로)
+    // 게임 속도 증가 (모바일에서는 더 천천히)
     if (gameState.score % 1000 === 0 && gameState.score > 0) {
-        gameState.gameSpeed += 0.3;
+        if (detectMobile()) {
+            gameState.gameSpeed += 0.15; // 모바일: 더 천천히 증가
+        } else {
+            gameState.gameSpeed += 0.3; // PC: 기존 속도
+        }
     }
     
     // UI 업데이트
@@ -795,7 +799,7 @@ function restartGame() {
         score: 0,
         lives: 2,
         gameOver: false,
-        gameSpeed: 2.5,
+        gameSpeed: detectMobile() ? 1.8 : 2.5, // 모바일 감지
         obstacles: [],
         powerUps: [],
         particles: [],
@@ -805,10 +809,19 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 2,
         lastJumpTime: 0,
-                    jumpCooldown: 600,
+        jumpCooldown: 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
+    
+    // 모바일에서 플레이어 물리 조정
+    if (detectMobile()) {
+        player.gravity = 0.6;
+        player.jumpPower = -12;
+    } else {
+        player.gravity = 0.8;
+        player.jumpPower = -15;
+    }
     
     player.y = player.groundY;
     player.velocityY = 0;
@@ -842,7 +855,7 @@ function detectMobile() {
            window.innerWidth <= 768;
 }
 
-// 모바일에서만 가이드 표시
+// 모바일에서만 가이드 표시 및 게임 속도 조정
 if (detectMobile()) {
     const mobileGuide = document.getElementById('mobileGuide');
     if (mobileGuide) {
@@ -852,6 +865,11 @@ if (detectMobile()) {
             mobileGuide.style.display = 'none';
         }, 5000);
     }
+    
+    // 모바일에서 게임 속도 조정
+    gameState.gameSpeed = 1.8; // PC: 2.5 → 모바일: 1.8
+    player.gravity = 0.6; // PC: 0.8 → 모바일: 0.6
+    player.jumpPower = -12; // PC: -15 → 모바일: -12
 }
 
 // 게임 시작
