@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>횡스크롤 점프 피하기 게임</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation; /* 모바일 터치 최적화 */
+        }
+        
+        .game-container {
+            position: relative;
+            border: 3px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);
+            touch-action: none; /* 캔버스에서 기본 터치 동작 비활성화 */
+        }
+        
+        .ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        
+        /* 모바일에서 UI 크기 조정 */
+        @media (max-width: 768px) {
+            .ui {
+                font-size: 14px;
+                top: 5px;
+                left: 5px;
+            }
+            
+            .ui div {
+                margin-bottom: 2px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .ui {
+                font-size: 12px;
+                top: 3px;
+                left: 3px;
+            }
+            
+            .ui div {
+                margin-bottom: 1px;
+            }
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .game-over h2 {
+            margin: 0 0 10px 0;
+            color: #ff6b6b;
+        }
+        
+        .game-over button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .game-over-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .game-over button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .game-over button:hover {
+            background: #45a049;
+        }
+        
+        .restart-btn {
+            background: #4CAF50 !important;
+        }
+        
+        .restart-btn:hover {
+            background: #45a049 !important;
+        }
+        
+        .character-btn {
+            background: #2196F3 !important;
+        }
+        
+        .character-btn:hover {
+            background: #1976D2 !important;
+        }
+        
+        /* 모바일 터치 가이드 */
+        .mobile-guide {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none; /* 기본적으로 숨김, 모바일에서만 표시 */
+            z-index: 1000; /* 다른 요소들 위에 표시 */
+        }
+        
+        /* 모바일에서만 표시 */
+        @media (max-width: 768px) {
+            .mobile-guide {
+                display: block;
+                top: 5px;
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+            
+            .game-container {
+                padding: 10px;
+            }
+            
+            #gameCanvas {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+        
+        .creator-info {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .creator-info p {
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .creator-info {
+                font-size: 10px;
+                padding: 6px 10px;
+                bottom: 5px;
+                right: 5px;
+            }
+        }
+        
+        .character-change-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #4834d4, #686de0);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        
+        .character-change-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        
+        .character-change-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .special-attack-btn {
+            position: absolute;
+            top: 10px;
+            right: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa502);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        
+        .special-attack-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        
+        .special-attack-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .special-attack-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        @media (max-width: 768px) {
+            .character-change-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                top: 5px;
+                right: 5px;
+            }
+            
+            .special-attack-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                top: 5px;
+                right: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="1000" height="500"></canvas>
+        <div class="ui">
+            <div>점수: <span id="score">0</span></div>
+            <div>생명: <span id="lives">3</span></div>
+            <div>점프: <span id="jumps">0</span>/<span id="maxJumps">2</span></div>
+            <div>필살기: <span id="specialAttacks">3</span></div>
+        </div>
+        
+        <button class="character-change-btn" onclick="selectCharacter()" title="캐릭터 변경">
+            🎭
+        </button>
+        
+        <button class="special-attack-btn" onclick="triggerSpecialAttack()" title="필살기">
+            ⚡
+        </button>
+        
+        <div class="creator-info">
+            <p>🎮 L2L 오랜지반 양예빈(Elsa) 가 만들었어요 🎮</p>
+        </div>
+        <div class="game-over" id="gameOver">
+            <h2>게임 오버!</h2>
+            <p>최종 점수: <span id="finalScore">0</span></p>
+            <div class="game-over-buttons">
+                <button onclick="restartGame()" class="restart-btn">다시 시작</button>
+                <button onclick="selectCharacter()" class="character-btn">캐릭터 선택</button>
+            </div>
+        </div>
+        <div class="mobile-guide" id="mobileGuide">
+            터치: 점프 | 더블터치: 필살기
+        </div>
+    </div>
+    
+
+    
+    <script src="sounds.js"></script>
+    <script src="game.js"></script>
+</body>
+</html> 

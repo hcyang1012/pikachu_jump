@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포켓몬 점프 게임 - 캐릭터 선택</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .intro-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .character-selection {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .character-card {
+            background: white;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 150px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .character-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border-color: #ff6b6b;
+        }
+        
+        .character-card.selected {
+            border-color: #4CAF50;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .character-image {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            display: block;
+            border-radius: 50%;
+            background: #f0f0f0;
+            padding: 10px;
+        }
+        
+        .character-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .character-description {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .selected .character-description {
+            color: #e8f5e8;
+        }
+        
+        .start-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .start-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ul {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        /* 모바일 반응형 디자인 */
+        @media (max-width: 768px) {
+            .intro-container {
+                padding: 20px;
+                margin: 10px;
+                max-width: 95%;
+                min-height: auto;
+            }
+            
+            .title {
+                font-size: 1.8em;
+                margin-bottom: 5px;
+            }
+            
+            .subtitle {
+                font-size: 1em;
+                margin-bottom: 20px;
+            }
+            
+            .character-selection {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                margin: 20px 0;
+            }
+            
+            .character-card {
+                width: 200px;
+                padding: 15px;
+            }
+            
+            .character-image {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .character-name {
+                font-size: 1.1em;
+            }
+            
+            .character-description {
+                font-size: 0.8em;
+            }
+            
+            .start-button {
+                padding: 12px 30px;
+                font-size: 1.1em;
+                margin-top: 20px;
+            }
+            
+            .instructions {
+                padding: 15px;
+                margin-top: 20px;
+            }
+            
+            .instructions h3 {
+                font-size: 1.1em;
+            }
+            
+            .instructions ul {
+                font-size: 0.9em;
+            }
+        }
+        
+        /* 작은 모바일 화면 */
+        @media (max-width: 480px) {
+            .intro-container {
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 1.5em;
+            }
+            
+            .subtitle {
+                font-size: 0.9em;
+            }
+            
+            .character-card {
+                width: 180px;
+                padding: 12px;
+            }
+            
+            .character-image {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .character-name {
+                font-size: 1em;
+            }
+            
+            .character-description {
+                font-size: 0.75em;
+            }
+        }
+        
+        .creator-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa502);
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .creator-info p {
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+        }
+        
+        @media (max-width: 768px) {
+            .creator-info {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .creator-info p {
+                font-size: 1.1em;
+                letter-spacing: 0.5px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .creator-info {
+                margin-top: 15px;
+                padding: 12px;
+                border-radius: 12px;
+            }
+            
+            .creator-info p {
+                font-size: 1em;
+                letter-spacing: 0.3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-container">
+        <div class="creator-info">
+            <p>🎮 L2L 오랜지반 양예빈(Elsa) 가 만들었어요 🎮</p>
+        </div>
+        
+        <h1 class="title">🔥 포켓몬 점프 게임 🔥</h1>
+        <p class="subtitle">악당들을 피해 최대한 오래 생존하세요!</p>
+        
+        <div class="character-selection">
+            <div class="character-card" data-character="charizard">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" 
+                     alt="리자몽" class="character-image">
+                <div class="character-name">리자몽</div>
+                <div class="character-description">
+                    강력한 불꽃 포켓몬<br>
+                    높은 점프력과 불꽃 효과
+                </div>
+            </div>
+            
+            <div class="character-card" data-character="pikachu">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" 
+                     alt="피카츄" class="character-image">
+                <div class="character-name">피카츄</div>
+                <div class="character-description">
+                    귀여운 전기 포켓몬<br>
+                    빠른 속도와 전기 효과
+                </div>
+            </div>
+            
+            <div class="character-card" data-character="squirtle">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png" 
+                     alt="꼬부기" class="character-image">
+                <div class="character-name">꼬부기</div>
+                <div class="character-description">
+                    튼튼한 물 포켓몬<br>
+                    안정적인 점프와 물 효과
+                </div>
+            </div>
+        </div>
+        
+        <button class="start-button" id="startButton" disabled>게임 시작</button>
+        
+        <div class="instructions">
+            <h3>🎮 조작법</h3>
+            <ul>
+                <li><strong>PC</strong>: ↑ 또는 스페이스바 (점프) / 엔터 (필살기)</li>
+                <li><strong>모바일</strong>: 터치 (점프) / 더블터치 (필살기)</li>
+                <li><strong>목표</strong>: 악당들을 피해 최대한 오래 생존하기</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        let selectedCharacter = null;
+        
+        // 캐릭터 카드 클릭 이벤트
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // 이전 선택 해제
+                document.querySelectorAll('.character-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // 현재 카드 선택
+                card.classList.add('selected');
+                selectedCharacter = card.dataset.character;
+                
+                // 시작 버튼 활성화
+                document.getElementById('startButton').disabled = false;
+            });
+        });
+        
+        // 게임 시작 버튼 클릭 이벤트
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (selectedCharacter) {
+                // 선택된 캐릭터 정보를 URL 파라미터로 전달
+                                        window.location.href = `game.html?character=${selectedCharacter}`;
+            }
+        });
+        
+        // 캐릭터 카드 호버 효과
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                if (!card.classList.contains('selected')) {
+                    card.style.transform = 'translateY(-5px)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                if (!card.classList.contains('selected')) {
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
