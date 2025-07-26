@@ -219,10 +219,6 @@ function handleTouchStart(e) {
     lastTouchTime = currentTime;
     touchStartTime = currentTime;
     
-    // 점프 활성화 (즉시)
-    keys.ArrowUp = true;
-    keys.Space = true;
-    
     // 터치 쿨다운 설정
     touchCooldown = currentTime;
 }
@@ -233,12 +229,16 @@ function handleTouchEnd(e) {
     
     // 짧은 터치만 점프로 인식 (300ms 이하)
     if (currentTime - touchStartTime <= 300) {
-        // 점프는 touchend에서 비활성화하지 않음 (점프 함수에서 처리)
+        // 짧은 터치일 때만 점프 실행
+        keys.ArrowUp = true;
+        keys.Space = true;
+        
+        // 점프 키를 즉시 비활성화 (다음 프레임에서 점프 처리 후)
+        setTimeout(() => {
+            keys.ArrowUp = false;
+            keys.Space = false;
+        }, 50);
     }
-    
-    // 터치 종료 시 점프 키 비활성화
-    keys.ArrowUp = false;
-    keys.Space = false;
 }
 
 function handleTouchMove(e) {
