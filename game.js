@@ -115,7 +115,7 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 3, // 최대 점프 횟수 (3단 점프 지원)
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: detectMobile() ? 50 : 600, // 모바일: 50ms (더블/트리플 점프용), PC: 600ms
+    jumpCooldown: detectMobile() ? 30 : 600, // 모바일: 30ms (더블/트리플 점프용), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
@@ -166,7 +166,7 @@ function handleTouchStart(e) {
     const currentTime = Date.now();
     
     // 터치 쿨다운 체크 (모바일에서는 더 민감하게)
-    const cooldown = detectMobile() ? 150 : 150; // 모바일 쿨다운 150ms
+    const cooldown = detectMobile() ? 100 : 150; // 모바일 쿨다운 100ms
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
@@ -560,12 +560,14 @@ class SpecialEffectParticle {
     }
 }
 
-// 충돌 감지 함수
+// 충돌 감지 함수 (더 정확한 감지)
 function checkCollision(rect1, rect2) {
-    return rect1.x < rect2.x + rect2.width &&
-           rect1.x + rect1.width > rect2.x &&
-           rect1.y < rect2.y + rect2.height &&
-           rect1.y + rect1.height > rect2.y;
+    // 충돌 박스에 여유 공간 추가 (더 관대한 충돌 감지)
+    const margin = 5;
+    return rect1.x + margin < rect2.x + rect2.width &&
+           rect1.x + rect1.width - margin > rect2.x &&
+           rect1.y + margin < rect2.y + rect2.height &&
+           rect1.y + rect1.height - margin > rect2.y;
 }
 
 // 악당 생성
@@ -913,7 +915,7 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 3, // 3단 점프 지원
         lastJumpTime: 0,
-        jumpCooldown: detectMobile() ? 50 : 600,
+        jumpCooldown: detectMobile() ? 30 : 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
