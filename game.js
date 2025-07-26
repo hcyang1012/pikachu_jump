@@ -138,30 +138,11 @@ document.addEventListener('keyup', (e) => {
 let touchStartTime = 0;
 let lastTouchTime = 0;
 let touchCooldown = 0;
-let doubleTapTime = 0;
-let lastTapTime = 0;
-let tapCount = 0;
 
 // 터치 이벤트 함수 (캔버스와 배경 모두에서 사용)
 function handleTouchStart(e) {
     e.preventDefault(); // 기본 터치 동작 방지
     const currentTime = Date.now();
-    
-    // 더블 탭 감지 (모바일에서는 더 긴 시간 허용)
-    const doubleTapTime = detectMobile() ? 500 : 300;
-    if (currentTime - lastTapTime < doubleTapTime) { // 모바일: 500ms, PC: 300ms
-        tapCount++;
-        if (tapCount === 2) {
-            // 더블 탭으로 필살기 실행
-            triggerSpecialAttack();
-            tapCount = 0;
-            lastTapTime = 0;
-            return;
-        }
-    } else {
-        tapCount = 1;
-    }
-    lastTapTime = currentTime;
     
     // 터치 쿨다운 체크 (모바일에서는 더 짧게)
     const cooldown = detectMobile() ? 100 : 150;
@@ -199,15 +180,6 @@ function handleTouchEnd(e) {
     
     // 필살기는 즉시 비활성화
     keys.Enter = false;
-    
-    // 더블 탭 타이머 (모바일에서는 더 긴 시간)
-    const resetTime = detectMobile() ? 800 : 500;
-    setTimeout(() => {
-        if (tapCount === 1) {
-            tapCount = 0;
-            lastTapTime = 0;
-        }
-    }, resetTime);
 }
 
 function handleTouchMove(e) {
