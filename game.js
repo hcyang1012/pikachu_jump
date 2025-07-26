@@ -166,7 +166,7 @@ function handleTouchStart(e) {
     const currentTime = Date.now();
     
     // 터치 쿨다운 체크 (모바일에서는 더 길게)
-    const cooldown = detectMobile() ? 250 : 150; // 모바일 쿨다운 더 증가
+    const cooldown = detectMobile() ? 500 : 150; // 모바일 쿨다운 500ms
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
