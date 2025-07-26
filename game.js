@@ -115,7 +115,7 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 3, // 최대 점프 횟수 (3단 점프 지원)
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: detectMobile() ? 50 : 600, // 모바일: 50ms (매우 짧은 쿨다운), PC: 600ms
+    jumpCooldown: detectMobile() ? 300 : 600, // 모바일: 300ms (더블/트리플 점프용), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
@@ -913,7 +913,7 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 3, // 3단 점프 지원
         lastJumpTime: 0,
-        jumpCooldown: detectMobile() ? 50 : 600,
+        jumpCooldown: detectMobile() ? 300 : 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
