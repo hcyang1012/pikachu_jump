@@ -102,14 +102,14 @@ let gameState = {
 // 플레이어 설정
 const player = {
     x: detectMobile() ? 80 : 150, // 모바일에서는 더 왼쪽에 위치
-    y: canvas.height - (detectMobile() ? 60 : 80),
+    y: canvas.height - (detectMobile() ? 120 : 140),
     width: detectMobile() ? 35 : 40, // 모바일에서는 조금 작게
     height: detectMobile() ? 35 : 40,
     velocityY: 0,
     isJumping: false,
     jumpPower: -16,
     gravity: 0.7,
-    groundY: canvas.height - (detectMobile() ? 60 : 80)
+    groundY: canvas.height - (detectMobile() ? 120 : 140)
 };
 
 // 키보드 입력 상태
@@ -145,7 +145,7 @@ function handleTouchStart(e) {
     const currentTime = Date.now();
     
     // 터치 쿨다운 체크 (모바일에서는 더 짧게)
-    const cooldown = detectMobile() ? 200 : 150; // 모바일 쿨다운 증가
+    const cooldown = detectMobile() ? 300 : 150; // 모바일 쿨다운 더 증가
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
@@ -239,7 +239,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 250 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -254,7 +254,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 250 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -269,7 +269,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 더 긴 초기화 시간
+        const resetTime = detectMobile() ? 250 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -303,7 +303,9 @@ class Villain {
         this.width = 35 + Math.random() * 15;
         this.height = 45 + Math.random() * 25;
         this.x = canvas.width;
-        this.y = canvas.height - this.height;
+        // 발 위치 기준으로 조정 (플레이어와 동일한 기준)
+        const groundY = detectMobile() ? canvas.height - 120 : canvas.height - 140;
+        this.y = groundY; // 플레이어와 같은 발 위치
         this.speed = gameState.gameSpeed + Math.random() * 1;
         this.type = Math.random() < 0.4 ? 'high' : 'low';
         this.villainType = this.getRandomVillain();
@@ -312,9 +314,9 @@ class Villain {
         this.loadImage();
         
         if (this.type === 'high') {
-            this.y = canvas.height - this.height;
+            this.y = groundY; // 플레이어와 같은 발 위치
         } else {
-            this.y = canvas.height - this.height;
+            this.y = groundY; // 플레이어와 같은 발 위치
         }
     }
     
@@ -382,9 +384,11 @@ class PowerUp {
         this.width = 20;
         this.height = 20;
         this.x = canvas.width;
-        this.y = canvas.height - 100 - Math.random() * 100;
+        // 발 위치 기준으로 조정 (플레이어와 동일한 기준)
+        const groundY = detectMobile() ? canvas.height - 120 : canvas.height - 140;
+        this.y = groundY - 20 - Math.random() * 80; // 지면 위에서 랜덤 높이
         this.speed = gameState.gameSpeed;
-                    this.type = Math.random() < 0.5 ? 'life' : 'score'; // 생명 아이템 비율 증가
+        this.type = Math.random() < 0.5 ? 'life' : 'score'; // 생명 아이템 비율 증가
     }
     
     update() {
@@ -826,8 +830,10 @@ function renderGame() {
     gameState.specialEffectParticles.forEach(particle => particle.draw());
     
     // 바닥 그리기
-    ctx.fillStyle = '#2f3542';
-    ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+    ctx.fillStyle = 'rgba(47, 53, 66, 0.7)'; // 반투명으로 변경
+    const groundHeight = 10; // 높이를 절반으로 줄임
+    const groundY = detectMobile() ? canvas.height - 120 + 35 : canvas.height - 140 + 40; // 캐릭터 높이만큼 아래로
+    ctx.fillRect(0, groundY, canvas.width, groundHeight);
 }
 
 // 게임 오버 함수
@@ -879,16 +885,16 @@ function restartGame() {
     // 모바일에서 플레이어 위치 조정
     if (detectMobile()) {
         player.x = 80;
-        player.y = canvas.height - 60;
+        player.y = canvas.height - 120;
         player.width = 35;
         player.height = 35;
-        player.groundY = canvas.height - 60;
+        player.groundY = canvas.height - 120;
     } else {
         player.x = 150;
-        player.y = canvas.height - 80;
+        player.y = canvas.height - 140;
         player.width = 40;
         player.height = 40;
-        player.groundY = canvas.height - 80;
+        player.groundY = canvas.height - 140;
     }
     player.velocityY = 0;
     player.isJumping = false;
