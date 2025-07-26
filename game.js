@@ -92,7 +92,7 @@ let gameState = {
     lastObstacleTime: 0,
     obstacleInterval: 2000, // 2초마다 장애물 생성
     jumpCount: 0, // 점프 횟수
-    maxJumps: 2, // 최대 점프 횟수
+    maxJumps: 3, // 최대 점프 횟수 (3단 점프 지원)
     lastJumpTime: 0, // 마지막 점프 시간
     jumpCooldown: detectMobile() ? 50 : 600, // 모바일: 200ms (더 빠른 이단 점프), PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
@@ -145,7 +145,7 @@ function handleTouchStart(e) {
     const currentTime = Date.now();
     
     // 터치 쿨다운 체크 (모바일에서는 더 짧게)
-    const cooldown = detectMobile() ? 100 : 150;
+    const cooldown = detectMobile() ? 200 : 150; // 모바일 쿨다운 증가
     if (currentTime - touchCooldown < cooldown) {
         return; // 쿨다운 중이면 무시
     }
@@ -193,6 +193,26 @@ document.body.addEventListener('touchstart', handleTouchStart);
 document.body.addEventListener('touchend', handleTouchEnd);
 document.body.addEventListener('touchmove', handleTouchMove);
 
+// 필살기 버튼에 직접 터치 이벤트 추가
+const specialAttackBtn = document.getElementById('specialAttackBtn');
+if (specialAttackBtn) {
+    specialAttackBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // 이벤트 전파 방지
+        triggerSpecialAttack();
+    });
+}
+
+// 캐릭터 변경 버튼에 직접 터치 이벤트 추가
+const characterChangeBtn = document.querySelector('.character-change-btn');
+if (characterChangeBtn) {
+    characterChangeBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // 이벤트 전파 방지
+        selectCharacter();
+    });
+}
+
 // 모바일에서 더블 탭 줌 방지 (body에도 적용)
 document.body.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) {
@@ -219,7 +239,7 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 50 : 80;
+        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -234,7 +254,22 @@ function jump() {
         playSound('jumpSound');
         
         // 터치 후 키 상태 초기화 (모바일용)
-        const resetTime = detectMobile() ? 50 : 80;
+        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 더 긴 초기화 시간
+        setTimeout(() => {
+            keys.ArrowUp = false;
+            keys.Space = false;
+        }, resetTime);
+    }
+    // 세 번째 점프 (공중에서, 쿨다운 확인)
+    else if (gameState.jumpCount === 2 && 
+             currentTime - gameState.lastJumpTime >= gameState.jumpCooldown) {
+        player.velocityY = player.jumpPower;
+        gameState.jumpCount++;
+        gameState.lastJumpTime = currentTime;
+        playSound('jumpSound');
+        
+        // 터치 후 키 상태 초기화 (모바일용)
+        const resetTime = detectMobile() ? 150 : 80; // 모바일에서 더 긴 초기화 시간
         setTimeout(() => {
             keys.ArrowUp = false;
             keys.Space = false;
@@ -825,7 +860,7 @@ function restartGame() {
         lastObstacleTime: 0,
         obstacleInterval: 2000,
         jumpCount: 0,
-        maxJumps: 2,
+        maxJumps: 3, // 3단 점프 지원
         lastJumpTime: 0,
         jumpCooldown: detectMobile() ? 200 : 600,
         specialAttackCount: 3,

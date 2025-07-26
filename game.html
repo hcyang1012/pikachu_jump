@@ -198,9 +198,9 @@
         @media (max-width: 768px) and (orientation: portrait) {
             .game-container {
                 width: 92vw;
-                height: 92vh;
+                height: 88vh;
                 padding: 4px;
-                margin: 4vh 4vw;
+                margin: 6vh 4vw 8vh 4vw;
             }
             
             #gameCanvas {
@@ -255,6 +255,8 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             z-index: 1000;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .character-change-btn:hover {
@@ -281,6 +283,8 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             z-index: 1000;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .special-attack-btn:hover {
@@ -306,6 +310,8 @@
                 font-size: 18px;
                 top: 5px;
                 right: 5px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
             
             .special-attack-btn {
@@ -314,6 +320,8 @@
                 font-size: 18px;
                 top: 5px;
                 right: 55px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
         }
         
@@ -325,6 +333,8 @@
                 font-size: 26px;
                 top: 12px;
                 right: 12px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
             
             .special-attack-btn {
@@ -333,6 +343,8 @@
                 font-size: 26px;
                 top: 12px;
                 right: 82px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
             
             .game-over button {
@@ -349,15 +361,15 @@
         <div class="ui">
             <div>점수: <span id="score">0</span></div>
             <div>생명: <span id="lives">3</span></div>
-            <div>점프: <span id="jumps">0</span>/<span id="maxJumps">2</span></div>
+            <div>점프: <span id="jumps">0</span>/<span id="maxJumps">3</span></div>
             <div>필살기: <span id="specialAttacks">3</span></div>
         </div>
         
         <button class="character-change-btn" onclick="selectCharacter()" title="캐릭터 변경">
-            🎭
+            🔄
         </button>
         
-        <button class="special-attack-btn" onclick="triggerSpecialAttack()" title="필살기">
+        <button class="special-attack-btn" onclick="triggerSpecialAttack()" title="필살기" id="specialAttackBtn">
             ⚡
         </button>
         
@@ -373,7 +385,7 @@
             </div>
         </div>
         <div class="mobile-guide" id="mobileGuide">
-            화면 어디든 터치: 점프 | 버튼: 필살기
+            화면 어디든 터치: 점프 (최대 3단) | 버튼: 필살기
         </div>
     </div>
     
