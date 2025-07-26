@@ -94,7 +94,7 @@ let gameState = {
     jumpCount: 0, // 점프 횟수
     maxJumps: 2, // 최대 점프 횟수
     lastJumpTime: 0, // 마지막 점프 시간
-    jumpCooldown: 600, // 점프 쿨다운 (600ms로 조정)
+    jumpCooldown: detectMobile() ? 400 : 600, // 모바일: 400ms, PC: 600ms
     specialAttackCount: 3, // 필살기 횟수
     maxSpecialAttacks: 3 // 최대 필살기 횟수
 };
@@ -809,15 +809,15 @@ function restartGame() {
         jumpCount: 0,
         maxJumps: 2,
         lastJumpTime: 0,
-        jumpCooldown: 600,
+        jumpCooldown: detectMobile() ? 400 : 600,
         specialAttackCount: 3,
         maxSpecialAttacks: 3
     };
     
     // 모바일에서 플레이어 물리 조정
     if (detectMobile()) {
-        player.gravity = 0.6;
-        player.jumpPower = -12;
+        player.gravity = 0.4; // 더 천천히 떨어짐
+        player.jumpPower = -10; // 더 낮은 점프
     } else {
         player.gravity = 0.8;
         player.jumpPower = -15;
@@ -868,8 +868,8 @@ if (detectMobile()) {
     
     // 모바일에서 게임 속도 조정
     gameState.gameSpeed = 1.8; // PC: 2.5 → 모바일: 1.8
-    player.gravity = 0.6; // PC: 0.8 → 모바일: 0.6
-    player.jumpPower = -12; // PC: -15 → 모바일: -12
+    player.gravity = 0.4; // PC: 0.8 → 모바일: 0.4 (더 천천히 떨어짐)
+    player.jumpPower = -10; // PC: -15 → 모바일: -10 (더 낮은 점프)
 }
 
 // 게임 시작
